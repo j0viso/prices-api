@@ -1,0 +1,103 @@
+openapi: 3.0.3
+info:
+  title: Prices API
+  description: Price applicable to a product of a brand at a given date and time
+  version: 1.0.0
+tags:
+  - name: pricing
+paths:
+  /prices:
+    get:
+      tags:
+        - pricing
+      summary: Get the price applicable to a product of a brand at a date
+      operationId: getApplicablePrice
+      parameters:
+        - name: brandId
+          in: query
+          description: Brand identifier, positive (1 = ZARA)
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: productId
+          in: query
+          description: Product identifier, positive
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: applicationDate
+          in: query
+          description: Date and time the price must apply at, ISO-8601 (2020-06-14T10:00:00)
+          required: true
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: The price in force at the date
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PriceResponse"
+        "400":
+          description: A parameter is missing, malformed or not positive
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: No price of the product and brand covers the date
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+components:
+  schemas:
+    PriceResponse:
+      type: object
+      required:
+        - brandId
+        - productId
+        - priceList
+        - startDate
+        - endDate
+        - price
+        - currency
+      properties:
+        brandId:
+          type: integer
+          format: int64
+        productId:
+          type: integer
+          format: int64
+        priceList:
+          type: integer
+          format: int64
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        price:
+          type: number
+        currency:
+          type: string
+    ProblemDetail:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+          format: int32
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri

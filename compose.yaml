@@ -1,0 +1,26 @@
+name: prices
+
+services:
+  prices:
+    build: .
+    image: prices:local
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 15s
+  maven:
+    image: maven:3.9-eclipse-temurin-21
+    profiles:
+      - tools
+    working_dir: /app
+    volumes:
+      - .:/app
+      - m2:/root/.m2
+
+volumes:
+  m2:
+    name: prices-m2

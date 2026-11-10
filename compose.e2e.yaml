@@ -1,0 +1,15 @@
+name: prices-e2e
+
+services:
+  prices:
+    ports: !reset []
+  e2e:
+    image: maven:3.9-eclipse-temurin-21
+    depends_on:
+      prices:
+        condition: service_healthy
+    working_dir: /e2e
+    volumes:
+      - ./e2e:/e2e
+      - m2:/root/.m2
+    command: mvn -q test
